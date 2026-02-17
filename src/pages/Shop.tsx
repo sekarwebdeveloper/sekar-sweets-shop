@@ -3,13 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import { categories, getProductsByCategory, searchProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") || categories[0];
   const searchQuery = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const activeCategory = categories.includes(categoryParam as any) ? categoryParam : categories[0];
 
@@ -65,27 +66,6 @@ export default function Shop() {
           </div>
         </div>
 
-        {/* Tabs */}
-        {!searchQuery && (
-          <div className="mb-8 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 min-w-max pb-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSearchParams({ category: cat })}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                    activeCategory === cat
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground border border-border hover:border-primary hover:text-foreground"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Search results label */}
         {searchQuery && (
           <p className="text-sm text-muted-foreground mb-4">
@@ -93,17 +73,90 @@ export default function Shop() {
           </p>
         )}
 
-        {/* Products grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filteredProducts.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
-        </div>
+        {/* Main layout: sidebar (30%) + content (70%) on desktop, dropdown on mobile */}
+        {!searchQuery && (
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Mobile dropdown */}
+            <div className="md:hidden relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-lg text-sm font-medium text-foreground"
+              >
+                {activeCategory}
+                <ChevronDown size={16} className={`transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+              {dropdownOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl z-30 overflow-hidden">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setSearchParams({ category: cat });
+                        setDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                        activeCategory === cat
+                          ? "bg-primary text-primary-foreground font-semibold"
+                          : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">No products found</p>
+            {/* Desktop sidebar (30%) */}
+            <aside className="hidden md:block w-[30%] flex-shrink-0">
+              <div className="sticky top-24 bg-card rounded-xl border border-border p-4 space-y-1">
+                <h3 className="font-heading text-lg font-semibold text-foreground mb-3 px-2">Categories</h3>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSearchParams({ category: cat })}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      activeCategory === cat
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </aside>
+
+            {/* Products grid (70%) */}
+            <div className="md:w-[70%]">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {filteredProducts.map((product, i) => (
+                  <ProductCard key={product.id} product={product} index={i} />
+                ))}
+              </div>
+              {filteredProducts.length === 0 && (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground text-lg">No products found</p>
+                </div>
+              )}
+            </div>
           </div>
+        )}
+
+        {/* Search results (no sidebar) */}
+        {searchQuery && (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {filteredProducts.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))}
+            </div>
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground text-lg">No products found</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

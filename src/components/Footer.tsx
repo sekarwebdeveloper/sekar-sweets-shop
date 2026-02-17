@@ -12,7 +12,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
-            <h3 className="font-heading text-2xl font-bold gold-text-gradient mb-4">Nithyaamirtham</h3>
+            <h3 className="font-heading text-2xl font-bold gold-text-gradient mb-4">Sekar Sweets</h3>
             <p className="text-cream/60 text-sm leading-relaxed">
               Handcrafted sweets & savouries from the heart of Tamil Nadu. Pure taste, naturally fresh.
             </p>
@@ -85,7 +85,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-cream/10 text-center">
-          <p className="text-sm text-cream/40">© 2026 Nithyaamirtham. All rights reserved. Made with love in Tamil Nadu.</p>
+          <p className="text-sm text-cream/40">© 2026 Sekar Sweets. All rights reserved. Made with love in Tamil Nadu.</p>
         </div>
       </div>
     </footer>

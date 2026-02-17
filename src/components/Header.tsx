@@ -63,7 +63,7 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-heading text-xl md:text-2xl font-bold gold-text-gradient">
-              Nithyaamirtham
+              Sekar Sweets
             </span>
           </Link>
 
@@ -216,7 +216,7 @@ export default function Header() {
               className="fixed top-0 left-0 bottom-0 w-72 bg-accent z-50 p-6 overflow-y-auto md:hidden"
             >
               <div className="flex items-center justify-between mb-8">
-                <span className="font-heading text-xl font-bold gold-text-gradient">Nithyaamirtham</span>
+                <span className="font-heading text-xl font-bold gold-text-gradient">Sekar Sweets</span>
                 <button onClick={() => setMobileOpen(false)} className="text-accent-foreground">
                   <X size={24} />
                 </button>
