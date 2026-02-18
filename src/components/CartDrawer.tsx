@@ -75,7 +75,7 @@ export default function CartDrawer() {
                   <button
                     onClick={() => {
                       setIsOpen(false);
-                      navigate("/checkout");
+                      navigate("/checkout/details");
                     }}
                     className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
                   >

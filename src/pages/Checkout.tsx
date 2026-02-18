@@ -21,6 +21,16 @@ export default function Checkout() {
   const deliveryCharge = totalPrice > 500 ? 0 : 50;
   const grandTotal = totalPrice + deliveryCharge;
 
+  // Get customer details saved from previous step
+  const customerDetails = (() => {
+    try {
+      const raw = sessionStorage.getItem("customerDetails");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   if (items.length === 0 && !orderPlaced) {
     return (
       <main className="pt-20 min-h-screen flex items-center justify-center">
@@ -42,7 +52,13 @@ export default function Checkout() {
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md px-4">
           <CheckCircle2 size={72} className="mx-auto text-primary mb-6" />
           <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Placed!</h2>
-          <p className="text-muted-foreground mb-8">Thank you for your order. You will receive a confirmation shortly.</p>
+          {customerDetails && (
+            <p className="text-muted-foreground mb-2">
+              Hi {customerDetails.firstName}, your order will be delivered to{" "}
+              <strong>{customerDetails.city}, {customerDetails.state}</strong>.
+            </p>
+          )}
+          <p className="text-muted-foreground mb-8">Thank you for your order. A confirmation will be sent to your email shortly.</p>
           <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
             Back to Home
           </Link>
@@ -52,13 +68,32 @@ export default function Checkout() {
   }
 
   return (
-    <main className="pt-20 min-h-screen">
+    <main className="pt-20 min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Progress bar */}
+        <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/30 text-primary flex items-center justify-center text-sm font-bold border border-primary">✓</div>
+            <span className="text-sm text-muted-foreground hidden sm:block">Delivery Details</span>
+          </div>
+          <div className="flex-1 h-0.5 bg-primary mx-2" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
+            <span className="text-sm font-semibold text-foreground hidden sm:block">Payment</span>
+          </div>
+        </div>
+
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft size={18} /> Back
         </button>
 
-        <h1 className="font-heading text-3xl font-bold text-foreground mb-8">Checkout</h1>
+        <h1 className="font-heading text-3xl font-bold text-foreground mb-2">Payment</h1>
+        {customerDetails && (
+          <p className="text-sm text-muted-foreground mb-8">
+            Delivering to: <strong className="text-foreground">{customerDetails.firstName} {customerDetails.lastName}</strong>{" "}
+            — {customerDetails.address}, {customerDetails.city}, {customerDetails.state} {customerDetails.pincode}
+          </p>
+        )}
 
         <div className="grid md:grid-cols-5 gap-8">
           {/* Payment methods (3/5) */}
@@ -124,6 +159,7 @@ export default function Checkout() {
                 onClick={() => {
                   setOrderPlaced(true);
                   clearCart();
+                  sessionStorage.removeItem("customerDetails");
                 }}
                 className="w-full mt-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >

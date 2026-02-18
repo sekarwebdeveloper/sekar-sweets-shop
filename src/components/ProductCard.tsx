@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import type { Product } from "@/data/products";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +14,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const wishlisted = isWishlisted(product.id);
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -20,14 +22,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="group bg-card rounded-xl overflow-hidden border border-border card-hover"
+      className="group bg-card rounded-xl overflow-hidden border border-border card-hover cursor-pointer"
+      onClick={() => navigate(`/product/${product.id}`)}
     >
       <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
+        <div className="w-full h-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
           <span className="font-heading text-lg text-muted-foreground/60">{product.name}</span>
         </div>
         <button
-          onClick={() => toggleWishlist(product.id)}
+          onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
           className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm transition-all hover:bg-card"
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -46,7 +49,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <span className="text-xs text-muted-foreground ml-1">/ {product.weight}</span>
           </div>
           <button
-            onClick={() => addItem(product)}
+            onClick={(e) => { e.stopPropagation(); addItem(product); }}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:opacity-90 transition-all active:scale-95"
           >
             <ShoppingCart size={14} />
