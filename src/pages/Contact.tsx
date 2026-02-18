@@ -1,19 +1,80 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
+
+// ── EmailJS config ──────────────────────────────────────────────
+// 1. Go to https://www.emailjs.com and sign up for free
+// 2. Create a Service (Gmail) → copy the Service ID
+// 3. Create an Email Template with variables: {{from_name}}, {{from_email}}, {{message}}
+//    Set "To Email" to: sekar.basilmedia@gmail.com
+// 4. Copy your Public Key from Account → API Keys
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+// ────────────────────────────────────────────────────────────────
+
+interface FormData {
+  name: string;
+  email: string;
+  message: string;
+}
+
+const contactInfo = [
+  { icon: MapPin, title: "Visit Us", text: "123 Sweet Street, T. Nagar, Chennai, Tamil Nadu 600017" },
+  { icon: Phone, title: "Call / WhatsApp", text: "+91 98765 43210" },
+  { icon: Mail, title: "Email", text: "sekar.basilmedia@gmail.com" },
+  { icon: Clock, title: "Working Hours", text: "Mon - Sat: 9:00 AM - 8:00 PM" },
+];
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const formRef = useRef<HTMLFormElement>(null);
+  const [form, setForm] = useState<FormData>({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validate = (): boolean => {
+    const newErrors: Partial<FormData> = {};
+    if (!form.name.trim()) newErrors.name = "Name is required";
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      newErrors.email = "Valid email is required";
+    if (!form.message.trim() || form.message.trim().length < 10)
+      newErrors.message = "Message must be at least 10 characters";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      toast.error("Please fill in all fields");
-      return;
+    if (!validate()) return;
+
+    setSending(true);
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name.trim(),
+          from_email: form.email.trim(),
+          message: form.message.trim(),
+          to_email: "sekar.basilmedia@gmail.com",
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      toast.success("Message sent! We'll get back to you soon.");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      toast.error("Failed to send message. Please try again or call us directly.");
+    } finally {
+      setSending(false);
     }
-    toast.success("Message sent! We'll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+  };
+
+  const update = (field: keyof FormData, value: string) => {
+    setForm((f) => ({ ...f, [field]: value }));
+    if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
   };
 
   return (
@@ -31,48 +92,73 @@ export default function Contact() {
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Form */}
           <motion.form
+            ref={formRef}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onSubmit={handleSubmit}
             className="space-y-5"
+            noValidate
           >
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Name</label>
               <input
                 type="text"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Your name"
+                onChange={(e) => update("name", e.target.value)}
+                className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
+                  errors.name ? "border-red-400" : "border-border"
+                }`}
+                placeholder="Your full name"
                 maxLength={100}
               />
+              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Email</label>
               <input
                 type="email"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => update("email", e.target.value)}
+                className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
+                  errors.email ? "border-red-400" : "border-border"
+                }`}
                 placeholder="your@email.com"
                 maxLength={255}
               />
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Message</label>
               <textarea
                 value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none h-32"
-                placeholder="Your message..."
+                onChange={(e) => update("message", e.target.value)}
+                className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none h-36 transition-colors ${
+                  errors.message ? "border-red-400" : "border-border"
+                }`}
+                placeholder="Tell us how we can help you..."
                 maxLength={1000}
               />
+              <div className="flex justify-between items-start mt-1">
+                {errors.message
+                  ? <p className="text-xs text-red-500">{errors.message}</p>
+                  : <span />
+                }
+                <span className="text-xs text-muted-foreground">{form.message.length}/1000</span>
+              </div>
             </div>
+
             <button
               type="submit"
-              className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              disabled={sending}
+              className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              Send Message
+              {sending ? (
+                <><Loader2 size={18} className="animate-spin" /> Sending…</>
+              ) : (
+                <><Send size={18} /> Send Message</>
+              )}
             </button>
           </motion.form>
 
@@ -82,12 +168,7 @@ export default function Contact() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
           >
-            {[
-              { icon: MapPin, title: "Visit Us", text: "123 Sweet Street, T. Nagar, Chennai, Tamil Nadu 600017" },
-              { icon: Phone, title: "Call / WhatsApp", text: "+91 98765 43210" },
-              { icon: Mail, title: "Email", text: "hello@nithyaamirtham.com" },
-              { icon: Clock, title: "Working Hours", text: "Mon - Sat: 9:00 AM - 8:00 PM" },
-            ].map((info) => (
+            {contactInfo.map((info) => (
               <div key={info.title} className="flex gap-4">
                 <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
                   <info.icon size={18} className="text-primary" />
@@ -108,7 +189,7 @@ export default function Contact() {
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
-                title="Nithyaamirtham Location"
+                title="Sekar Sweets Location"
               />
             </div>
           </motion.div>
