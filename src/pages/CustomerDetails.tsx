@@ -85,16 +85,23 @@ export default function CustomerDetails() {
   const grandTotal = totalPrice + deliveryCharge;
 
   const InputField = ({
-    label, field, type = "text", placeholder, maxLength,
+    label, field, type = "text", placeholder, maxLength, inputMode,
   }: {
-    label: string; field: keyof FormData; type?: string; placeholder: string; maxLength?: number;
+    label: string; field: keyof FormData; type?: string; placeholder: string; maxLength?: number; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   }) => (
     <div>
       <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
       <input
         type={type}
+        inputMode={inputMode}
         value={form[field]}
-        onChange={(e) => update(field, e.target.value)}
+        onChange={(e) => {
+          let value = e.target.value;
+          if (field === "phone" || field === "pincode") {
+            value = value.replace(/\D/g, "");
+          }
+          update(field, value);
+        }}
         placeholder={placeholder}
         maxLength={maxLength}
         className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
@@ -142,7 +149,7 @@ export default function CustomerDetails() {
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <InputField label="Email Address" field="email" type="email" placeholder="your@email.com" maxLength={255} />
-                <InputField label="Mobile Number" field="phone" type="tel" placeholder="10-digit mobile" maxLength={10} />
+                <InputField label="Mobile Number" field="phone" type="text" inputMode="numeric" placeholder="10-digit mobile" maxLength={10} />
               </div>
             </div>
 
@@ -174,7 +181,7 @@ export default function CustomerDetails() {
                     {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
                   </div>
                 </div>
-                <InputField label="Pincode" field="pincode" placeholder="6-digit pincode" maxLength={6} />
+                <InputField label="Pincode" field="pincode" type="text" inputMode="numeric" placeholder="6-digit pincode" maxLength={6} />
               </div>
             </div>
 
