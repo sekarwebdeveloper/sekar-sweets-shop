@@ -53,12 +53,16 @@ export default function Checkout() {
         : {},
       theme: { color: "#D4A017" },
       handler: () => {
+        document.body.style.overflow = "";
         setOrderPlaced(true);
         clearCart();
         sessionStorage.removeItem("customerDetails");
       },
       modal: {
-        ondismiss: () => setLoading(false),
+        ondismiss: () => {
+          document.body.style.overflow = "";
+          setLoading(false);
+        },
       },
     };
 
