@@ -17,6 +17,38 @@ interface FormData {
   landmark: string;
 }
 
+function InputField({
+  label, field, type = "text", placeholder, maxLength, inputMode, value, error, onChange,
+}: {
+  label: string; field: string; type?: string; placeholder: string; maxLength?: number;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  value: string; error?: string; onChange: (field: string, value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => {
+          let val = e.target.value;
+          if (field === "phone" || field === "pincode") {
+            val = val.replace(/\D/g, "");
+          }
+          onChange(field, val);
+        }}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
+          error ? "border-red-400" : "border-border"
+        }`}
+      />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+}
+
 const INDIAN_STATES = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
   "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
