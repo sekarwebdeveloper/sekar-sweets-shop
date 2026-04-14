@@ -2,26 +2,25 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CreditCard, Building2, Smartphone, ArrowLeft, CheckCircle2, ShoppingBag } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ShoppingBag } from "lucide-react";
 
-const paymentMethods = [
-  { id: "gpay", name: "Google Pay", icon: Smartphone, description: "Pay with Google Pay UPI" },
-  { id: "card", name: "Credit / Debit Card", icon: CreditCard, description: "Visa, Mastercard, RuPay" },
-  { id: "netbanking", name: "Net Banking", icon: Building2, description: "All major banks supported" },
-  { id: "paypal", name: "PayPal", icon: CreditCard, description: "Pay with your PayPal account" },
-  { id: "upi", name: "UPI", icon: Smartphone, description: "PhonePe, Paytm, BHIM" },
-];
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+const RAZORPAY_KEY = "rzp_test_1234567890abcd";
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
-  const [selectedPayment, setSelectedPayment] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const deliveryCharge = totalPrice > 500 ? 0 : 50;
   const grandTotal = totalPrice + deliveryCharge;
 
-  // Get customer details saved from previous step
   const customerDetails = (() => {
     try {
       const raw = sessionStorage.getItem("customerDetails");
@@ -30,6 +29,47 @@ export default function Checkout() {
       return null;
     }
   })();
+
+  const handlePayment = () => {
+    if (!window.Razorpay) {
+      alert("Payment gateway is loading. Please try again.");
+      return;
+    }
+
+    setLoading(true);
+
+    const options = {
+      key: RAZORPAY_KEY,
+      amount: grandTotal * 100, // Razorpay expects paise
+      currency: "INR",
+      name: "Sekar Sweets",
+      description: `Order of ${items.length} item(s)`,
+      prefill: customerDetails
+        ? {
+            name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+            email: customerDetails.email,
+            contact: customerDetails.phone,
+          }
+        : {},
+      theme: { color: "#D4A017" },
+      handler: () => {
+        setOrderPlaced(true);
+        clearCart();
+        sessionStorage.removeItem("customerDetails");
+      },
+      modal: {
+        ondismiss: () => setLoading(false),
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", () => {
+      setLoading(false);
+      alert("Payment failed. Please try again.");
+    });
+    rzp.open();
+    setLoading(false);
+  };
 
   if (items.length === 0 && !orderPlaced) {
     return (
@@ -96,39 +136,32 @@ export default function Checkout() {
         )}
 
         <div className="grid md:grid-cols-5 gap-8">
-          {/* Payment methods (3/5) */}
-          <div className="md:col-span-3 space-y-4">
-            <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Select Payment Method</h2>
-            {paymentMethods.map((method) => (
-              <motion.button
-                key={method.id}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedPayment(method.id)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
-                  selectedPayment === method.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-card hover:border-primary/40"
-                }`}
+          {/* Payment info */}
+          <div className="md:col-span-3">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Razorpay Secure Payment</h2>
+              <p className="text-muted-foreground mb-6">
+                Click the button below to pay securely via Razorpay. You can choose from UPI, Cards, Net Banking, Wallets, and more.
+              </p>
+              <div className="flex flex-wrap gap-3 mb-6">
+                {["UPI", "Credit Card", "Debit Card", "Net Banking", "Wallets"].map((m) => (
+                  <span key={m} className="px-3 py-1.5 bg-secondary text-muted-foreground text-xs rounded-full border border-border">
+                    {m}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={handlePayment}
+                disabled={loading}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 text-lg"
               >
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                  selectedPayment === method.id ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
-                }`}>
-                  <method.icon size={22} />
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">{method.name}</p>
-                  <p className="text-sm text-muted-foreground">{method.description}</p>
-                </div>
-                <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  selectedPayment === method.id ? "border-primary" : "border-border"
-                }`}>
-                  {selectedPayment === method.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                </div>
-              </motion.button>
-            ))}
+                {loading ? "Opening Razorpay..." : `Pay ₹${grandTotal.toLocaleString()}`}
+              </button>
+              <p className="text-xs text-muted-foreground text-center mt-3">🔒 Payments secured by Razorpay</p>
+            </div>
           </div>
 
-          {/* Order summary (2/5) */}
+          {/* Order summary */}
           <div className="md:col-span-2">
             <div className="bg-card border border-border rounded-xl p-6 sticky top-24">
               <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Order Summary</h3>
@@ -154,17 +187,6 @@ export default function Checkout() {
                   <span className="text-primary">₹{grandTotal.toLocaleString()}</span>
                 </div>
               </div>
-              <button
-                disabled={!selectedPayment}
-                onClick={() => {
-                  setOrderPlaced(true);
-                  clearCart();
-                  sessionStorage.removeItem("customerDetails");
-                }}
-                className="w-full mt-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Pay ₹{grandTotal.toLocaleString()}
-              </button>
               {deliveryCharge === 0 && (
                 <p className="text-xs text-primary text-center mt-2">🎉 Free delivery on orders above ₹500</p>
               )}
