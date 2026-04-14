@@ -116,34 +116,6 @@ export default function CustomerDetails() {
   const deliveryCharge = totalPrice > 500 ? 0 : 50;
   const grandTotal = totalPrice + deliveryCharge;
 
-  const InputField = ({
-    label, field, type = "text", placeholder, maxLength, inputMode,
-  }: {
-    label: string; field: keyof FormData; type?: string; placeholder: string; maxLength?: number; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
-  }) => (
-    <div>
-      <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={form[field]}
-        onChange={(e) => {
-          let value = e.target.value;
-          if (field === "phone" || field === "pincode") {
-            value = value.replace(/\D/g, "");
-          }
-          update(field, value);
-        }}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        className={`w-full px-4 py-3 bg-card border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
-          errors[field] ? "border-red-400" : "border-border"
-        }`}
-      />
-      {errors[field] && <p className="text-xs text-red-500 mt-1">{errors[field]}</p>}
-    </div>
-  );
-
   return (
     <main className="pt-20 min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
