@@ -53,17 +53,22 @@ export default function Checkout() {
         : {},
       theme: { color: "#D4A017" },
       handler: () => {
+        document.body.style.overflow = "";
         setOrderPlaced(true);
         clearCart();
         sessionStorage.removeItem("customerDetails");
       },
       modal: {
-        ondismiss: () => setLoading(false),
+        ondismiss: () => {
+          document.body.style.overflow = "";
+          setLoading(false);
+        },
       },
     };
 
     const rzp = new window.Razorpay(options);
     rzp.on("payment.failed", () => {
+      document.body.style.overflow = "";
       setLoading(false);
       alert("Payment failed. Please try again.");
     });
