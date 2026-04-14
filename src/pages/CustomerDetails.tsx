@@ -148,12 +148,12 @@ export default function CustomerDetails() {
                 <h2 className="font-semibold text-foreground">Personal Information</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <InputField label="First Name" field="firstName" placeholder="First name" maxLength={50} />
-                <InputField label="Last Name" field="lastName" placeholder="Last name" maxLength={50} />
+                <InputField label="First Name" field="firstName" placeholder="First name" maxLength={50} value={form.firstName} error={errors.firstName} onChange={update} />
+                <InputField label="Last Name" field="lastName" placeholder="Last name" maxLength={50} value={form.lastName} error={errors.lastName} onChange={update} />
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
-                <InputField label="Email Address" field="email" type="email" placeholder="your@email.com" maxLength={255} />
-                <InputField label="Mobile Number" field="phone" type="text" inputMode="numeric" placeholder="10-digit mobile" maxLength={10} />
+                <InputField label="Email Address" field="email" type="email" placeholder="your@email.com" maxLength={255} value={form.email} error={errors.email} onChange={update} />
+                <InputField label="Mobile Number" field="phone" type="text" inputMode="numeric" placeholder="10-digit mobile" maxLength={10} value={form.phone} error={errors.phone} onChange={update} />
               </div>
             </div>
 
@@ -164,10 +164,10 @@ export default function CustomerDetails() {
                 <h2 className="font-semibold text-foreground">Delivery Address</h2>
               </div>
               <div className="space-y-4">
-                <InputField label="Full Address" field="address" placeholder="House no., street, area" maxLength={200} />
-                <InputField label="Landmark (optional)" field="landmark" placeholder="Near school, mall, etc." maxLength={100} />
+                <InputField label="Full Address" field="address" placeholder="House no., street, area" maxLength={200} value={form.address} error={errors.address} onChange={update} />
+                <InputField label="Landmark (optional)" field="landmark" placeholder="Near school, mall, etc." maxLength={100} value={form.landmark} error={errors.landmark} onChange={update} />
                 <div className="grid grid-cols-2 gap-4">
-                  <InputField label="City" field="city" placeholder="City" maxLength={50} />
+                  <InputField label="City" field="city" placeholder="City" maxLength={50} value={form.city} error={errors.city} onChange={update} />
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">State</label>
                     <select
@@ -185,7 +185,7 @@ export default function CustomerDetails() {
                     {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
                   </div>
                 </div>
-                <InputField label="Pincode" field="pincode" type="text" inputMode="numeric" placeholder="6-digit pincode" maxLength={6} />
+                <InputField label="Pincode" field="pincode" type="text" inputMode="numeric" placeholder="6-digit pincode" maxLength={6} value={form.pincode} error={errors.pincode} onChange={update} />
               </div>
             </div>
 
