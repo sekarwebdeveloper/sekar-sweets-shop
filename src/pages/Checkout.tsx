@@ -68,6 +68,7 @@ export default function Checkout() {
 
     const rzp = new window.Razorpay(options);
     rzp.on("payment.failed", () => {
+      document.body.style.overflow = "";
       setLoading(false);
       alert("Payment failed. Please try again.");
     });
