@@ -4,14 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, ShoppingBag } from "lucide-react";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
-const RAZORPAY_KEY = "rzp_test_1234567890abcd";
-
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -30,50 +22,15 @@ export default function Checkout() {
     }
   })();
 
-  const handlePayment = () => {
-    if (!window.Razorpay) {
-      alert("Payment gateway is loading. Please try again.");
-      return;
-    }
-
+  const handlePlaceOrder = () => {
     setLoading(true);
-
-    const options = {
-      key: RAZORPAY_KEY,
-      amount: grandTotal * 100, // Razorpay expects paise
-      currency: "INR",
-      name: "Sekar Sweets",
-      description: `Order of ${items.length} item(s)`,
-      prefill: customerDetails
-        ? {
-            name: `${customerDetails.firstName} ${customerDetails.lastName}`,
-            email: customerDetails.email,
-            contact: customerDetails.phone,
-          }
-        : {},
-      theme: { color: "#D4A017" },
-      handler: () => {
-        document.body.style.overflow = "";
-        setOrderPlaced(true);
-        clearCart();
-        sessionStorage.removeItem("customerDetails");
-      },
-      modal: {
-        ondismiss: () => {
-          document.body.style.overflow = "";
-          setLoading(false);
-        },
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.on("payment.failed", () => {
-      document.body.style.overflow = "";
+    // Simulate order processing
+    setTimeout(() => {
+      setOrderPlaced(true);
+      clearCart();
+      sessionStorage.removeItem("customerDetails");
       setLoading(false);
-      alert("Payment failed. Please try again.");
-    });
-    rzp.open();
-    setLoading(false);
+    }, 1500);
   };
 
   if (items.length === 0 && !orderPlaced) {
@@ -144,25 +101,25 @@ export default function Checkout() {
           {/* Payment info */}
           <div className="md:col-span-3">
             <div className="bg-card border border-border rounded-xl p-6">
-              <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Razorpay Secure Payment</h2>
+              <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Order Confirmation</h2>
               <p className="text-muted-foreground mb-6">
-                Click the button below to pay securely via Razorpay. You can choose from UPI, Cards, Net Banking, Wallets, and more.
+                Review your order details and click the button below to place your order. Cash on Delivery is available.
               </p>
               <div className="flex flex-wrap gap-3 mb-6">
-                {["UPI", "Credit Card", "Debit Card", "Net Banking", "Wallets"].map((m) => (
+                {["Cash on Delivery", "Free Delivery above ₹500"].map((m) => (
                   <span key={m} className="px-3 py-1.5 bg-secondary text-muted-foreground text-xs rounded-full border border-border">
                     {m}
                   </span>
                 ))}
               </div>
               <button
-                onClick={handlePayment}
+                onClick={handlePlaceOrder}
                 disabled={loading}
                 className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 text-lg"
               >
-                {loading ? "Opening Razorpay..." : `Pay ₹${grandTotal.toLocaleString()}`}
+                {loading ? "Processing..." : `Place Order - ₹${grandTotal.toLocaleString()}`}
               </button>
-              <p className="text-xs text-muted-foreground text-center mt-3">🔒 Payments secured by Razorpay</p>
+              <p className="text-xs text-muted-foreground text-center mt-3">Cash on Delivery available</p>
             </div>
           </div>
 
