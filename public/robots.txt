@@ -12,3 +12,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /checkout/
+Disallow: /cart
+
+Sitemap: https://sekar-sweets-shop.lovable.app/sitemap.xml
