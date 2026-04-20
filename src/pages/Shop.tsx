@@ -30,6 +30,21 @@ export default function Shop() {
 
   return (
     <main className="pt-20 min-h-screen">
+      <SEO
+        title={searchQuery ? `Search "${searchQuery}" - Sekar Sweets` : `${activeCategory} - Sekar Sweets`}
+        description={searchQuery
+          ? `Search results for "${searchQuery}" at Sekar Sweets. Browse premium Indian sweets and savouries.`
+          : `Shop ${activeCategory.toLowerCase()} online at Sekar Sweets. Authentic Tirunelveli flavours, made with pure ghee. Cash on Delivery across India.`}
+        keywords={[
+          activeCategory.toLowerCase(),
+          `buy ${activeCategory.toLowerCase()} online`,
+          "indian sweets shop",
+          "sekar sweets",
+          "tirunelveli sweets",
+          "online sweet shop india",
+        ]}
+        url={`/shop?category=${encodeURIComponent(activeCategory)}`}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <motion.div
