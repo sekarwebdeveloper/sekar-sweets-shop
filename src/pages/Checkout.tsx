@@ -3,17 +3,33 @@ import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, ShoppingBag } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import SEO from "@/components/SEO";
+
+interface CustomerDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  landmark?: string;
+}
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const deliveryCharge = totalPrice > 500 ? 0 : 50;
   const grandTotal = totalPrice + deliveryCharge;
 
-  const customerDetails = (() => {
+  const customerDetails: CustomerDetails | null = (() => {
     try {
       const raw = sessionStorage.getItem("customerDetails");
       return raw ? JSON.parse(raw) : null;
@@ -22,20 +38,88 @@ export default function Checkout() {
     }
   })();
 
-  const handlePlaceOrder = () => {
+  /**
+   * Save the order to Supabase.
+   * ─────────────────────────────────────────────────────────────
+   * Tables used:
+   *   • public.orders        — header info (customer + totals)
+   *   • public.order_items   — one row per cart line
+   *
+   * RLS: Anonymous INSERTs are allowed (guest checkout).
+   * SELECTs are blocked from public — admin views orders via
+   * Lovable Cloud → Database, or via service-role queries.
+   *
+   * EDIT THIS FUNCTION later to:
+   *   • Trigger a confirmation email (edge function)
+   *   • Send Telegram/WhatsApp notification
+   *   • Connect a payment gateway (Razorpay/Stripe) before insert
+   */
+  const handlePlaceOrder = async () => {
+    if (!customerDetails) {
+      toast.error("Customer details missing. Please go back.");
+      return;
+    }
     setLoading(true);
-    // Simulate order processing
-    setTimeout(() => {
+    try {
+      // 1) Insert order header
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          first_name: customerDetails.firstName,
+          last_name: customerDetails.lastName,
+          email: customerDetails.email,
+          phone: customerDetails.phone,
+          address: customerDetails.address,
+          landmark: customerDetails.landmark || null,
+          city: customerDetails.city,
+          state: customerDetails.state,
+          pincode: customerDetails.pincode,
+          subtotal: totalPrice,
+          delivery_charge: deliveryCharge,
+          total: grandTotal,
+          payment_method: "COD",
+          status: "pending",
+        })
+        .select("id, order_number")
+        .single();
+
+      if (orderError || !order) throw orderError || new Error("Order insert failed");
+
+      // 2) Insert order items
+      const itemsPayload = items.map((it) => ({
+        order_id: order.id,
+        product_id: it.product.id,
+        product_name: it.product.name,
+        product_category: it.product.category,
+        product_weight: it.product.weight,
+        unit_price: it.product.price,
+        quantity: it.quantity,
+        line_total: it.product.price * it.quantity,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(itemsPayload);
+
+      if (itemsError) throw itemsError;
+
+      setOrderNumber(order.order_number);
       setOrderPlaced(true);
       clearCart();
       sessionStorage.removeItem("customerDetails");
+      toast.success(`Order ${order.order_number} placed successfully!`);
+    } catch (err) {
+      console.error("Order placement failed:", err);
+      toast.error("Something went wrong. Please try again or contact us.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   if (items.length === 0 && !orderPlaced) {
     return (
       <main className="pt-20 min-h-screen flex items-center justify-center">
+        <SEO title="Checkout - Sekar Sweets" description="Complete your sweet order securely." url="/checkout/payment" />
         <div className="text-center">
           <ShoppingBag size={64} className="mx-auto text-muted-foreground/40 mb-4" />
           <h2 className="font-heading text-2xl font-bold text-foreground mb-2">Your cart is empty</h2>
@@ -51,9 +135,15 @@ export default function Checkout() {
   if (orderPlaced) {
     return (
       <main className="pt-20 min-h-screen flex items-center justify-center">
+        <SEO title="Order Placed - Sekar Sweets" description="Your order has been placed successfully." url="/checkout/payment" />
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md px-4">
           <CheckCircle2 size={72} className="mx-auto text-primary mb-6" />
           <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Placed!</h2>
+          {orderNumber && (
+            <p className="text-sm text-muted-foreground mb-3">
+              Order ID: <strong className="text-foreground">{orderNumber}</strong>
+            </p>
+          )}
           {customerDetails && (
             <p className="text-muted-foreground mb-2">
               Hi {customerDetails.firstName}, your order will be delivered to{" "}
@@ -71,6 +161,7 @@ export default function Checkout() {
 
   return (
     <main className="pt-20 min-h-screen bg-background">
+      <SEO title="Payment - Sekar Sweets" description="Confirm and place your order. Cash on Delivery available." url="/checkout/payment" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-8">
@@ -98,7 +189,6 @@ export default function Checkout() {
         )}
 
         <div className="grid md:grid-cols-5 gap-8">
-          {/* Payment info */}
           <div className="md:col-span-3">
             <div className="bg-card border border-border rounded-xl p-6">
               <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Order Confirmation</h2>
@@ -117,13 +207,12 @@ export default function Checkout() {
                 disabled={loading}
                 className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 text-lg"
               >
-                {loading ? "Processing..." : `Place Order - ₹${grandTotal.toLocaleString()}`}
+                {loading ? "Placing order..." : `Place Order - ₹${grandTotal.toLocaleString()}`}
               </button>
               <p className="text-xs text-muted-foreground text-center mt-3">Cash on Delivery available</p>
             </div>
           </div>
 
-          {/* Order summary */}
           <div className="md:col-span-2">
             <div className="bg-card border border-border rounded-xl p-6 sticky top-24">
               <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Order Summary</h3>

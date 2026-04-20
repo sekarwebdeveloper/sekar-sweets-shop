@@ -6,17 +6,8 @@ import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
-
-// Generate 5 different gradient "images" per product using color variations
-const imageVariants = [
-  "from-amber-200 to-orange-300",
-  "from-yellow-100 to-amber-200",
-  "from-orange-200 to-red-300",
-  "from-amber-300 to-yellow-400",
-  "from-orange-100 to-amber-300",
-];
-
-const imageLabels = ["Main", "Close-up", "Texture", "Plated", "Pack"];
+import SEO from "@/components/SEO";
+import { productSchema, breadcrumbSchema } from "@/lib/seo-schemas";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
