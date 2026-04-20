@@ -210,8 +210,8 @@ export default function CustomerDetails() {
               <div className="space-y-3 max-h-52 overflow-y-auto mb-4 pr-1">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex items-center gap-3 text-sm">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-muted flex-shrink-0 flex items-center justify-center">
-                      <span className="text-[8px] text-muted-foreground text-center leading-tight px-0.5">{item.product.name}</span>
+                    <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                      <img src={item.product.image} alt={item.product.name} loading="lazy" width={40} height={40} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-foreground truncate">{item.product.name}</p>
