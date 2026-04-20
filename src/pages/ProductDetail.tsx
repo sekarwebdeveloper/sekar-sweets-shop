@@ -6,17 +6,8 @@ import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
-
-// Generate 5 different gradient "images" per product using color variations
-const imageVariants = [
-  "from-amber-200 to-orange-300",
-  "from-yellow-100 to-amber-200",
-  "from-orange-200 to-red-300",
-  "from-amber-300 to-yellow-400",
-  "from-orange-100 to-amber-300",
-];
-
-const imageLabels = ["Main", "Close-up", "Texture", "Plated", "Pack"];
+import SEO from "@/components/SEO";
+import { productSchema, breadcrumbSchema } from "@/lib/seo-schemas";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -74,22 +65,39 @@ export default function ProductDetail() {
           <span className="text-foreground truncate max-w-[150px]">{product.name}</span>
         </div>
 
+        {/* SEO + JSON-LD schema for this product */}
+        <SEO
+          title={product.seoTitle}
+          description={product.seoDescription}
+          keywords={product.seoKeywords}
+          image={product.images[0]?.src}
+          url={`/product/${product.id}`}
+          type="product"
+          schema={productSchema(product)}
+        />
+
         <div className="grid md:grid-cols-2 gap-10 mb-16">
           {/* ─── LEFT: Image Gallery ─── */}
           <div className="flex gap-3">
             {/* Thumbnails column */}
             <div className="flex flex-col gap-2 w-16 flex-shrink-0">
-              {imageVariants.map((gradient, i) => (
+              {product.images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
                   className={`w-16 h-16 rounded-lg border-2 overflow-hidden flex-shrink-0 transition-all ${
                     activeImage === i ? "border-primary shadow-md" : "border-border opacity-70 hover:opacity-100"
                   }`}
+                  aria-label={`View image ${i + 1} of ${product.name}`}
                 >
-                  <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                    <span className="text-[9px] font-medium text-foreground/60">{imageLabels[i]}</span>
-                  </div>
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    loading="lazy"
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -97,16 +105,18 @@ export default function ProductDetail() {
             {/* Main image */}
             <div className="flex-1 relative rounded-2xl overflow-hidden border border-border aspect-square bg-muted">
               <AnimatePresence mode="wait">
-                <motion.div
+                <motion.img
                   key={activeImage}
+                  src={product.images[activeImage].src}
+                  alt={product.images[activeImage].alt}
+                  width={1024}
+                  height={1024}
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`absolute inset-0 bg-gradient-to-br ${imageVariants[activeImage]} flex items-center justify-center`}
-                >
-                  <span className="font-heading text-2xl text-foreground/50 text-center px-4">{product.name}</span>
-                </motion.div>
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
               </AnimatePresence>
 
               {/* Prev / Next arrows */}
@@ -316,8 +326,8 @@ export default function ProductDetail() {
                   to={`/product/${p.id}`}
                   className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1"
                 >
-                  <div className="aspect-square bg-gradient-to-br from-secondary to-muted flex items-center justify-center p-4">
-                    <span className="text-xs font-medium text-muted-foreground text-center group-hover:text-foreground transition-colors">{p.name}</span>
+                  <div className="aspect-square bg-muted overflow-hidden">
+                    <img src={p.image} alt={p.images[0]?.alt || p.name} loading="lazy" width={400} height={400} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   <div className="p-3">
                     <p className="text-xs font-semibold text-foreground truncate mb-1">{p.name}</p>

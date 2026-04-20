@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart, Award, Users, Leaf } from "lucide-react";
+import SEO from "@/components/SEO";
+import { organizationSchema } from "@/lib/seo-schemas";
 
 const values = [
   { icon: Heart, title: "Made with Love", desc: "Every sweet is handcrafted with passion and care by our skilled artisans." },
@@ -11,6 +13,20 @@ const values = [
 export default function About() {
   return (
     <main className="pt-20 min-h-screen">
+      <SEO
+        title="About Us - Sekar Sweets | Authentic Tirunelveli Sweets"
+        description="Discover the story of Sekar Sweets — handcrafted Indian sweets and savouries from Tirunelveli, made with traditional family recipes and the finest ingredients."
+        keywords={[
+          "about sekar sweets",
+          "tirunelveli sweet shop",
+          "authentic indian sweets",
+          "family sweet shop",
+          "traditional sweet makers",
+          "nellai sweets brand",
+        ]}
+        url="/about"
+        schema={organizationSchema}
+      />
       <div className="container mx-auto px-4 py-12">
         {/* Hero */}
         <motion.div

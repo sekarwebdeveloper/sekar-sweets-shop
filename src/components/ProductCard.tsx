@@ -25,10 +25,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="group bg-card rounded-xl overflow-hidden border border-border card-hover cursor-pointer"
       onClick={() => navigate(`/product/${product.id}`)}
     >
-      <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-          <span className="font-heading text-lg text-muted-foreground/60">{product.name}</span>
-        </div>
+      <div className="relative aspect-square bg-muted overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.images[0]?.alt || `${product.name} - ${product.category}`}
+          loading="lazy"
+          width={1024}
+          height={1024}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
         <button
           onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
           className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm transition-all hover:bg-card"

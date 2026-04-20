@@ -42,8 +42,8 @@ export default function CartDrawer() {
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
                   {items.map((item) => (
                     <div key={item.product.id} className="flex gap-4 p-3 bg-background rounded-lg">
-                      <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center flex-shrink-0">
-                        <ShoppingBag size={20} className="text-muted-foreground" />
+                      <div className="w-16 h-16 bg-muted rounded-md overflow-hidden flex-shrink-0">
+                        <img src={item.product.image} alt={item.product.name} loading="lazy" width={64} height={64} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm text-foreground truncate">{item.product.name}</h4>

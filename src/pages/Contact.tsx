@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
+import SEO from "@/components/SEO";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // 1. Go to https://www.emailjs.com and sign up for free
@@ -79,6 +80,19 @@ export default function Contact() {
 
   return (
     <main className="pt-20 min-h-screen">
+      <SEO
+        title="Contact Us - Sekar Sweets | Order Inquiries & Bulk Orders"
+        description="Get in touch with Sekar Sweets for orders, bulk inquiries, festival hampers and more. Email sekar.basilmedia@gmail.com or call us. Tirunelveli, Tamil Nadu."
+        keywords={[
+          "contact sekar sweets",
+          "bulk order indian sweets",
+          "wedding sweets order",
+          "festival sweets bulk",
+          "tirunelveli sweet shop contact",
+          "sweet shop email",
+        ]}
+        url="/contact"
+      />
       <div className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

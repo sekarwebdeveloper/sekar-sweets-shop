@@ -1,11 +1,28 @@
+import sweet1 from "@/assets/products/sweet-placeholder-1.jpg";
+import sweet2 from "@/assets/products/sweet-placeholder-2.jpg";
+import sweet3 from "@/assets/products/sweet-placeholder-3.jpg";
+import sweet4 from "@/assets/products/sweet-placeholder-4.jpg";
+import sweet5 from "@/assets/products/sweet-placeholder-5.jpg";
+
+export interface ProductImage {
+  src: string;
+  alt: string;
+}
+
 export interface Product {
   id: string;
+  slug: string;
   name: string;
   price: number;
   category: string;
-  image: string;
+  image: string; // primary image (kept for backward compat)
+  images: ProductImage[]; // 5 gallery images with alt text
   description: string;
   weight: string;
+  // SEO fields — edit these per product later
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string[];
 }
 
 export const categories = [
@@ -22,6 +39,17 @@ export const categories = [
 ] as const;
 
 export type Category = (typeof categories)[number];
+
+// Default 5-image gallery — replace per-product when client photos are ready
+const defaultGallery = (productName: string): ProductImage[] => [
+  { src: sweet1, alt: `${productName} — premium plated presentation` },
+  { src: sweet2, alt: `${productName} — close-up texture and garnish` },
+  { src: sweet3, alt: `${productName} — gift box packaging` },
+  { src: sweet4, alt: `${productName} — stacked on marble with rose petals` },
+  { src: sweet5, alt: `${productName} — traditional brass bowl serving` },
+];
+
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const generateProducts = (): Product[] => {
   const items: Record<string, { name: string; price: number; desc: string; weight: string }[]> = {
@@ -150,14 +178,31 @@ const generateProducts = (): Product[] => {
   const products: Product[] = [];
   Object.entries(items).forEach(([category, prods]) => {
     prods.forEach((p, i) => {
+      const id = `${category.toLowerCase().replace(/\s+/g, "-")}-${i + 1}`;
+      const gallery = defaultGallery(p.name);
       products.push({
-        id: `${category.toLowerCase().replace(/\s+/g, "-")}-${i + 1}`,
+        id,
+        slug: slugify(p.name),
         name: p.name,
         price: p.price,
         category,
-        image: `/placeholder.svg`,
+        image: gallery[0].src,
+        images: gallery,
         description: p.desc,
         weight: p.weight,
+        seoTitle: `${p.name} - Buy Online | Sekar Sweets`,
+        seoDescription: `${p.desc}. Order ${p.name} (${p.weight}) online from Sekar Sweets. Fresh, authentic ${category.toLowerCase()} delivered across India. Cash on Delivery available.`,
+        seoKeywords: [
+          p.name.toLowerCase(),
+          `buy ${p.name.toLowerCase()} online`,
+          category.toLowerCase(),
+          "indian sweets",
+          "sekar sweets",
+          "tirunelveli sweets",
+          "nellai sweets",
+          `${p.name.toLowerCase()} price`,
+          "authentic indian sweets",
+        ],
       });
     });
   });

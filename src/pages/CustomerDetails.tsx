@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, User, Phone, Mail, ChevronRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingBag } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface FormData {
   firstName: string;
@@ -118,6 +119,11 @@ export default function CustomerDetails() {
 
   return (
     <main className="pt-20 min-h-screen bg-background">
+      <SEO
+        title="Delivery Details - Checkout | Sekar Sweets"
+        description="Enter your delivery details to complete your order at Sekar Sweets."
+        url="/checkout/details"
+      />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-8">
@@ -204,8 +210,8 @@ export default function CustomerDetails() {
               <div className="space-y-3 max-h-52 overflow-y-auto mb-4 pr-1">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex items-center gap-3 text-sm">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-muted flex-shrink-0 flex items-center justify-center">
-                      <span className="text-[8px] text-muted-foreground text-center leading-tight px-0.5">{item.product.name}</span>
+                    <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                      <img src={item.product.image} alt={item.product.name} loading="lazy" width={40} height={40} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-foreground truncate">{item.product.name}</p>
