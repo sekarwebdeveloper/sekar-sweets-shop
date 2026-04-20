@@ -4,6 +4,7 @@ import { categories, getProductsByCategory, searchProducts } from "@/data/produc
 import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
 import { Search, ChevronDown } from "lucide-react";
+import SEO from "@/components/SEO";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();

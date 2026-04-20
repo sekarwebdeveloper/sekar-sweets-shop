@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart, Award, Users, Leaf } from "lucide-react";
+import SEO from "@/components/SEO";
+import { organizationSchema } from "@/lib/seo-schemas";
 
 const values = [
   { icon: Heart, title: "Made with Love", desc: "Every sweet is handcrafted with passion and care by our skilled artisans." },

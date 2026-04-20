@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, User, Phone, Mail, ChevronRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingBag } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface FormData {
   firstName: string;

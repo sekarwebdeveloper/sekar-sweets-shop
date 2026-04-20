@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
+import SEO from "@/components/SEO";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // 1. Go to https://www.emailjs.com and sign up for free

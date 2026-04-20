@@ -326,8 +326,8 @@ export default function ProductDetail() {
                   to={`/product/${p.id}`}
                   className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1"
                 >
-                  <div className="aspect-square bg-gradient-to-br from-secondary to-muted flex items-center justify-center p-4">
-                    <span className="text-xs font-medium text-muted-foreground text-center group-hover:text-foreground transition-colors">{p.name}</span>
+                  <div className="aspect-square bg-muted overflow-hidden">
+                    <img src={p.image} alt={p.images[0]?.alt || p.name} loading="lazy" width={400} height={400} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   <div className="p-3">
                     <p className="text-xs font-semibold text-foreground truncate mb-1">{p.name}</p>
