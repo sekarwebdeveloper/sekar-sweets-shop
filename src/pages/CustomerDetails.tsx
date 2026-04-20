@@ -119,6 +119,11 @@ export default function CustomerDetails() {
 
   return (
     <main className="pt-20 min-h-screen bg-background">
+      <SEO
+        title="Delivery Details - Checkout | Sekar Sweets"
+        description="Enter your delivery details to complete your order at Sekar Sweets."
+        url="/checkout/details"
+      />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-8">
