@@ -58,26 +58,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Social Media */}
           <div>
-            <h4 className="font-heading font-semibold text-primary mb-4">Stay Updated</h4>
-            <p className="text-sm text-cream/60 mb-3">Get exclusive offers and new arrivals</p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email"
-                className="flex-1 px-3 py-2 bg-chocolate-light border border-cream/10 rounded-md text-sm text-cream placeholder:text-cream/30 focus:outline-none focus:border-primary"
-              />
-              <button className="p-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity">
-                <Send size={16} />
-              </button>
-            </div>
-            <div className="flex gap-3 mt-4">
+            <h4 className="font-heading font-semibold text-primary mb-4">Follow Us</h4>
+            <p className="text-sm text-cream/60 mb-3">Connect with us on social media</p>
+            <div className="flex gap-3">
               {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-8 h-8 rounded-full bg-cream/10 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all">
-                  <Icon size={14} />
+                <a key={i} href="#" className="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all">
+                  <Icon size={18} />
                 </a>
               ))}
             </div>
