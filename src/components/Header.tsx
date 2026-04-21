@@ -172,7 +172,7 @@ export default function Header() {
             </div>
 
             {/* Wishlist */}
-            <Link to="/shop" className="relative text-accent-foreground/80 hover:text-primary transition-colors p-2" aria-label="Wishlist">
+            <Link to="/wishlist" className="relative text-accent-foreground/80 hover:text-primary transition-colors p-2" aria-label="Wishlist">
               <Heart size={20} />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
