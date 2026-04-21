@@ -1,5 +1,6 @@
 import HeroSlider from "@/components/HeroSlider";
 import FavoritesSection from "@/components/FavoritesSection";
+import TrendingProducts from "@/components/TrendingProducts";
 import TrustSection from "@/components/TrustSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import AboutSection from "@/components/AboutSection";
@@ -29,6 +30,7 @@ const Index = () => {
       />
       <HeroSlider />
       <FavoritesSection />
+      <TrendingProducts />
       <TrustSection />
       <TestimonialsSection />
       <AboutSection />
