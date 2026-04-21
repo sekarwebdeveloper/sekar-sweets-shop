@@ -198,54 +198,56 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/50 z-40 md:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.nav
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 left-0 bottom-0 w-72 bg-accent z-50 p-6 overflow-y-auto md:hidden"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <span className="font-heading text-xl font-bold gold-text-gradient">Sekar Sweets</span>
-                <button onClick={() => setMobileOpen(false)} className="text-accent-foreground">
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="space-y-4">
-                <Link to="/" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Home</Link>
-                <Link to="/shop" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Shop Now</Link>
-                <div className="pl-4 space-y-2">
-                  <p className="text-primary text-sm font-heading font-semibold">Sweets</p>
-                  {sweetCategories.map((cat) => (
-                    <Link key={cat} to={`/shop?category=${encodeURIComponent(cat)}`} className="block text-sm text-accent-foreground/70 hover:text-primary transition-colors">
-                      {cat}
-                    </Link>
-                  ))}
-                  <p className="text-primary text-sm font-heading font-semibold mt-3">Food</p>
-                  {foodCategories.map((cat) => (
-                    <Link key={cat} to={`/shop?category=${encodeURIComponent(cat)}`} className="block text-sm text-accent-foreground/70 hover:text-primary transition-colors">
-                      {cat}
-                    </Link>
-                  ))}
-                </div>
-                <Link to="/about" className="block text-accent-foreground hover:text-primary transition-colors font-medium">About</Link>
-                <Link to="/contact" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Contact</Link>
-              </div>
-            </motion.nav>
-          </>
-        )}
-      </AnimatePresence>
     </header>
+
+    {/* Mobile drawer — rendered OUTSIDE the header to escape its stacking context */}
+    <AnimatePresence>
+      {mobileOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-foreground/50 z-[60] md:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+          <motion.nav
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "tween", duration: 0.3 }}
+            className="fixed top-0 left-0 bottom-0 w-72 bg-accent z-[70] p-6 overflow-y-auto md:hidden"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <span className="font-heading text-xl font-bold gold-text-gradient">Sekar Sweets</span>
+              <button onClick={() => setMobileOpen(false)} className="text-accent-foreground">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <Link to="/" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Home</Link>
+              <Link to="/shop" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Shop Now</Link>
+              <div className="pl-4 space-y-2">
+                <p className="text-primary text-sm font-heading font-semibold">Sweets</p>
+                {sweetCategories.map((cat) => (
+                  <Link key={cat} to={`/shop?category=${encodeURIComponent(cat)}`} className="block text-sm text-accent-foreground/70 hover:text-primary transition-colors">
+                    {cat}
+                  </Link>
+                ))}
+                <p className="text-primary text-sm font-heading font-semibold mt-3">Food</p>
+                {foodCategories.map((cat) => (
+                  <Link key={cat} to={`/shop?category=${encodeURIComponent(cat)}`} className="block text-sm text-accent-foreground/70 hover:text-primary transition-colors">
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+              <Link to="/about" className="block text-accent-foreground hover:text-primary transition-colors font-medium">About</Link>
+              <Link to="/contact" className="block text-accent-foreground hover:text-primary transition-colors font-medium">Contact</Link>
+            </div>
+          </motion.nav>
+        </>
+      )}
+    </AnimatePresence>
+    </>
   );
 }
