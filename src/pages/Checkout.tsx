@@ -61,10 +61,21 @@ export default function Checkout() {
     }
     setLoading(true);
     try {
+      // Generate order number + id client-side so we don't need SELECT permission after insert
+      const newOrderId = (crypto as any).randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      const today = new Date();
+      const yy = String(today.getFullYear()).slice(-2);
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      const rand = String(Math.floor(Math.random() * 100000)).padStart(5, "0");
+      const newOrderNumber = `SS-${yy}${mm}${dd}-${rand}`;
+
       // 1) Insert order header
-      const { data: order, error: orderError } = await supabase
+      const { error: orderError } = await supabase
         .from("orders")
         .insert({
+          id: newOrderId,
+          order_number: newOrderNumber,
           first_name: customerDetails.firstName,
           last_name: customerDetails.lastName,
           email: customerDetails.email,
@@ -79,15 +90,13 @@ export default function Checkout() {
           total: grandTotal,
           payment_method: "COD",
           status: "pending",
-        })
-        .select("id, order_number")
-        .single();
+        });
 
-      if (orderError || !order) throw orderError || new Error("Order insert failed");
+      if (orderError) throw orderError;
 
       // 2) Insert order items
       const itemsPayload = items.map((it) => ({
-        order_id: order.id,
+        order_id: newOrderId,
         product_id: it.product.id,
         product_name: it.product.name,
         product_category: it.product.category,
