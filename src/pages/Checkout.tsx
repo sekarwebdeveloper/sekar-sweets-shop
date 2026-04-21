@@ -112,14 +112,14 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      setOrderNumber(order.order_number);
+      setOrderNumber(newOrderNumber);
       setOrderPlaced(true);
       clearCart();
       sessionStorage.removeItem("customerDetails");
-      toast.success(`Order ${order.order_number} placed successfully!`);
-    } catch (err) {
+      toast.success(`Order ${newOrderNumber} booked successfully!`);
+    } catch (err: any) {
       console.error("Order placement failed:", err);
-      toast.error("Something went wrong. Please try again or contact us.");
+      toast.error(err?.message || "Could not place order. Please try again.");
     } finally {
       setLoading(false);
     }
