@@ -147,7 +147,7 @@ export default function Checkout() {
         <SEO title="Order Placed - Sekar Sweets" description="Your order has been placed successfully." url="/checkout/payment" />
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md px-4">
           <CheckCircle2 size={72} className="mx-auto text-primary mb-6" />
-          <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Placed!</h2>
+          <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Confirmed!</h2>
           {orderNumber && (
             <p className="text-sm text-muted-foreground mb-3">
               Order ID: <strong className="text-foreground">{orderNumber}</strong>
@@ -155,11 +155,11 @@ export default function Checkout() {
           )}
           {customerDetails && (
             <p className="text-muted-foreground mb-2">
-              Hi {customerDetails.firstName}, your order will be delivered to{" "}
+              Hi {customerDetails.firstName}, your order has been booked and will be delivered to{" "}
               <strong>{customerDetails.city}, {customerDetails.state}</strong>.
             </p>
           )}
-          <p className="text-muted-foreground mb-8">Thank you for your order. A confirmation will be sent to your email shortly.</p>
+          <p className="text-muted-foreground mb-8">Thank you for your order. We'll contact you shortly to confirm delivery.</p>
           <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
             Back to Home
           </Link>
