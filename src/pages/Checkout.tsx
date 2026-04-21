@@ -61,10 +61,21 @@ export default function Checkout() {
     }
     setLoading(true);
     try {
+      // Generate order number + id client-side so we don't need SELECT permission after insert
+      const newOrderId = (crypto as any).randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      const today = new Date();
+      const yy = String(today.getFullYear()).slice(-2);
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      const rand = String(Math.floor(Math.random() * 100000)).padStart(5, "0");
+      const newOrderNumber = `SS-${yy}${mm}${dd}-${rand}`;
+
       // 1) Insert order header
-      const { data: order, error: orderError } = await supabase
+      const { error: orderError } = await supabase
         .from("orders")
         .insert({
+          id: newOrderId,
+          order_number: newOrderNumber,
           first_name: customerDetails.firstName,
           last_name: customerDetails.lastName,
           email: customerDetails.email,
@@ -79,15 +90,13 @@ export default function Checkout() {
           total: grandTotal,
           payment_method: "COD",
           status: "pending",
-        })
-        .select("id, order_number")
-        .single();
+        });
 
-      if (orderError || !order) throw orderError || new Error("Order insert failed");
+      if (orderError) throw orderError;
 
       // 2) Insert order items
       const itemsPayload = items.map((it) => ({
-        order_id: order.id,
+        order_id: newOrderId,
         product_id: it.product.id,
         product_name: it.product.name,
         product_category: it.product.category,
@@ -103,14 +112,14 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      setOrderNumber(order.order_number);
+      setOrderNumber(newOrderNumber);
       setOrderPlaced(true);
       clearCart();
       sessionStorage.removeItem("customerDetails");
-      toast.success(`Order ${order.order_number} placed successfully!`);
-    } catch (err) {
+      toast.success(`Order ${newOrderNumber} booked successfully!`);
+    } catch (err: any) {
       console.error("Order placement failed:", err);
-      toast.error("Something went wrong. Please try again or contact us.");
+      toast.error(err?.message || "Could not place order. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -138,7 +147,7 @@ export default function Checkout() {
         <SEO title="Order Placed - Sekar Sweets" description="Your order has been placed successfully." url="/checkout/payment" />
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md px-4">
           <CheckCircle2 size={72} className="mx-auto text-primary mb-6" />
-          <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Placed!</h2>
+          <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Order Confirmed!</h2>
           {orderNumber && (
             <p className="text-sm text-muted-foreground mb-3">
               Order ID: <strong className="text-foreground">{orderNumber}</strong>
@@ -146,11 +155,11 @@ export default function Checkout() {
           )}
           {customerDetails && (
             <p className="text-muted-foreground mb-2">
-              Hi {customerDetails.firstName}, your order will be delivered to{" "}
+              Hi {customerDetails.firstName}, your order has been booked and will be delivered to{" "}
               <strong>{customerDetails.city}, {customerDetails.state}</strong>.
             </p>
           )}
-          <p className="text-muted-foreground mb-8">Thank you for your order. A confirmation will be sent to your email shortly.</p>
+          <p className="text-muted-foreground mb-8">Thank you for your order. We'll contact you shortly to confirm delivery.</p>
           <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
             Back to Home
           </Link>
