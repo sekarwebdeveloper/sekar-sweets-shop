@@ -61,8 +61,8 @@ export default function ProductDetail() {
           <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:text-foreground transition-colors">
             {product.category}
           </Link>
-          <span>/</span>
-          <span className="text-foreground truncate max-w-[150px]">{product.name}</span>
+          <span className="hidden md:inline">/</span>
+          <span className="hidden md:inline text-foreground truncate max-w-[150px]">{product.name}</span>
         </div>
 
         {/* SEO + JSON-LD schema for this product */}
