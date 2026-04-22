@@ -76,11 +76,11 @@ export default function ProductDetail() {
           schema={productSchema(product)}
         />
 
-        <div className="grid md:grid-cols-2 gap-10 mb-16">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-12 md:mb-16">
           {/* ─── LEFT: Image Gallery ─── */}
-          <div className="flex gap-3">
-            {/* Thumbnails column */}
-            <div className="flex flex-col gap-2 w-16 flex-shrink-0">
+          <div className="flex flex-col md:flex-row gap-3">
+            {/* Thumbnails column - desktop only */}
+            <div className="hidden md:flex flex-col gap-2 w-16 flex-shrink-0">
               {product.images.map((img, i) => (
                 <button
                   key={i}
@@ -102,8 +102,8 @@ export default function ProductDetail() {
               ))}
             </div>
 
-            {/* Main image */}
-            <div className="flex-1 relative rounded-2xl overflow-hidden border border-border aspect-square bg-muted">
+            {/* Main image - smaller on mobile */}
+            <div className="flex-1 relative rounded-2xl overflow-hidden border border-border aspect-square bg-muted max-w-[320px] sm:max-w-[400px] md:max-w-none mx-auto md:mx-0 w-full">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImage}
@@ -121,30 +121,56 @@ export default function ProductDetail() {
 
               {/* Prev / Next arrows */}
               <button
-                onClick={() => setActiveImage((p) => (p - 1 + 5) % 5)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
+                onClick={() => setActiveImage((p) => (p - 1 + product.images.length) % product.images.length)}
+                aria-label="Previous image"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={18} />
               </button>
               <button
-                onClick={() => setActiveImage((p) => (p + 1) % 5)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
+                onClick={() => setActiveImage((p) => (p + 1) % product.images.length)}
+                aria-label="Next image"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md"
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={18} />
               </button>
 
               {/* Image counter */}
               <div className="absolute bottom-3 right-3 bg-card/80 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full">
-                {activeImage + 1} / 5
+                {activeImage + 1} / {product.images.length}
               </div>
 
               {/* Wishlist */}
               <button
                 onClick={() => toggleWishlist(product.id)}
+                aria-label="Toggle wishlist"
                 className="absolute top-3 right-3 p-2.5 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors"
               >
                 <Heart size={20} className={wishlisted ? "fill-primary text-primary" : "text-muted-foreground"} />
               </button>
+            </div>
+
+            {/* Thumbnails row - mobile only, below main image */}
+            <div className="flex md:hidden gap-2 justify-center overflow-x-auto pb-1">
+              {product.images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveImage(i)}
+                  className={`w-14 h-14 rounded-lg border-2 overflow-hidden flex-shrink-0 transition-all ${
+                    activeImage === i ? "border-primary shadow-md" : "border-border opacity-70"
+                  }`}
+                  aria-label={`View image ${i + 1} of ${product.name}`}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    loading="lazy"
+                    width={56}
+                    height={56}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           </div>
 
@@ -160,7 +186,7 @@ export default function ProductDetail() {
               {product.category}
             </span>
 
-            <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-3">{product.name}</h1>
+            <h1 className="font-heading text-2xl md:text-4xl font-bold text-foreground mb-3">{product.name}</h1>
 
             {/* Rating */}
             <div className="flex items-center gap-2 mb-4">
@@ -178,29 +204,29 @@ export default function ProductDetail() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-4xl font-bold text-primary">₹{product.price}</span>
+            <div className="flex items-baseline gap-3 mb-5 md:mb-6 flex-wrap">
+              <span className="text-3xl md:text-4xl font-bold text-primary">₹{product.price}</span>
               <span className="text-sm text-muted-foreground">/ {product.weight}</span>
-              <span className="text-sm text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">In Stock</span>
+              <span className="text-xs md:text-sm text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">In Stock</span>
             </div>
 
             {/* Short description */}
-            <p className="text-muted-foreground text-base leading-relaxed mb-6">{product.description}</p>
+            <p className="text-muted-foreground text-sm md:text-base leading-relaxed mb-5 md:mb-6">{product.description}</p>
 
             {/* Quantity selector */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6 flex-wrap">
               <span className="text-sm font-medium text-foreground">Quantity:</span>
               <div className="flex items-center border border-border rounded-lg overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center hover:bg-muted transition-colors text-foreground font-bold"
+                  className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-muted transition-colors text-foreground font-bold"
                 >
                   −
                 </button>
-                <span className="w-12 text-center font-semibold text-foreground">{quantity}</span>
+                <span className="w-10 md:w-12 text-center font-semibold text-foreground">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="w-10 h-10 flex items-center justify-center hover:bg-muted transition-colors text-foreground font-bold"
+                  className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-muted transition-colors text-foreground font-bold"
                 >
                   +
                 </button>
@@ -208,31 +234,33 @@ export default function ProductDetail() {
               <span className="text-sm text-muted-foreground">Total: <strong className="text-foreground">₹{(product.price * quantity).toLocaleString()}</strong></span>
             </div>
 
-            {/* CTA buttons */}
-            <div className="flex gap-3 mb-6">
+            {/* CTA buttons - reduced padding on mobile */}
+            <div className="flex gap-2 md:gap-3 mb-5 md:mb-6">
               <button
                 onClick={handleBuyNow}
-                className="flex-1 py-3.5 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all text-base"
+                className="flex-1 py-2.5 md:py-3.5 px-2 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all text-sm md:text-base"
               >
                 Buy Now
               </button>
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-3.5 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary/5 active:scale-95 transition-all flex items-center justify-center gap-2 text-base"
+                className="flex-1 py-2.5 md:py-3.5 px-2 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary/5 active:scale-95 transition-all flex items-center justify-center gap-1.5 md:gap-2 text-sm md:text-base"
               >
-                <ShoppingCart size={18} />
+                <ShoppingCart size={16} className="md:hidden" />
+                <ShoppingCart size={18} className="hidden md:inline" />
                 Add to Cart
               </button>
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className="w-12 h-12 border border-border rounded-xl flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0"
+                aria-label="Toggle wishlist"
+                className="w-10 h-10 md:w-12 md:h-12 border border-border rounded-xl flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0"
               >
-                <Heart size={20} className={wishlisted ? "fill-primary text-primary" : "text-muted-foreground"} />
+                <Heart size={18} className={wishlisted ? "fill-primary text-primary" : "text-muted-foreground"} />
               </button>
             </div>
 
             {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-3 p-4 bg-secondary/50 rounded-xl">
+            <div className="grid grid-cols-3 gap-2 md:gap-3 p-3 md:p-4 bg-secondary/50 rounded-xl">
               {[
                 { icon: Shield, label: "Quality Guarantee" },
                 { icon: Truck, label: "Ships in 1-2 Days" },
@@ -240,7 +268,7 @@ export default function ProductDetail() {
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1 text-center">
                   <Icon size={18} className="text-primary" />
-                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <span className="text-[11px] md:text-xs text-muted-foreground leading-tight">{label}</span>
                 </div>
               ))}
             </div>
