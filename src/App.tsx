@@ -17,6 +17,10 @@ import CustomerDetails from "./pages/CustomerDetails";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import ReturnsRefunds from "./pages/ReturnsRefunds";
+import FAQ from "./pages/FAQ";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +45,10 @@ const App = () => (
               <Route path="/checkout/payment" element={<Checkout />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/returns-refunds" element={<ReturnsRefunds />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
