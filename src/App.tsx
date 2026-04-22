@@ -17,6 +17,7 @@ import CustomerDetails from "./pages/CustomerDetails";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
+import ThankYou from "./pages/ThankYou";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import ReturnsRefunds from "./pages/ReturnsRefunds";
 import FAQ from "./pages/FAQ";
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/checkout/payment" element={<Checkout />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/shipping-policy" element={<ShippingPolicy />} />
               <Route path="/returns-refunds" element={<ReturnsRefunds />} />
               <Route path="/faq" element={<FAQ />} />
