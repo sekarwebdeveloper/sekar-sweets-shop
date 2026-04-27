@@ -3,7 +3,6 @@ import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, ShoppingBag } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 
@@ -39,20 +38,9 @@ export default function Checkout() {
   })();
 
   /**
-   * Save the order to Supabase.
-   * ─────────────────────────────────────────────────────────────
-   * Tables used:
-   *   • public.orders        — header info (customer + totals)
-   *   • public.order_items   — one row per cart line
-   *
-   * RLS: Anonymous INSERTs are allowed (guest checkout).
-   * SELECTs are blocked from public — admin views orders via
-   * Lovable Cloud → Database, or via service-role queries.
-   *
-   * EDIT THIS FUNCTION later to:
-   *   • Trigger a confirmation email (edge function)
-   *   • Send Telegram/WhatsApp notification
-   *   • Connect a payment gateway (Razorpay/Stripe) before insert
+   * Place the order locally (no database, no payment gateway).
+   * Generates an order number, shows a success toast, then
+   * redirects the customer to the Thank You page.
    */
   const handlePlaceOrder = async () => {
     if (!customerDetails) {
@@ -68,51 +56,6 @@ export default function Checkout() {
       const dd = String(today.getDate()).padStart(2, "0");
       const rand = String(Math.floor(Math.random() * 100000)).padStart(5, "0");
       const newOrderNumber = `SS-${yy}${mm}${dd}-${rand}`;
-
-      // Try to save to backend silently; ignore errors so the customer
-      // experience is never blocked by API/key issues.
-      try {
-        const newOrderId = (crypto as any).randomUUID
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random()}`;
-
-        const { error: orderError } = await supabase.from("orders").insert({
-          id: newOrderId,
-          order_number: newOrderNumber,
-          first_name: customerDetails.firstName,
-          last_name: customerDetails.lastName,
-          email: customerDetails.email,
-          phone: customerDetails.phone,
-          address: customerDetails.address,
-          landmark: customerDetails.landmark || null,
-          city: customerDetails.city,
-          state: customerDetails.state,
-          pincode: customerDetails.pincode,
-          subtotal: totalPrice,
-          delivery_charge: deliveryCharge,
-          total: grandTotal,
-          payment_method: "COD",
-          status: "pending",
-        });
-
-        if (!orderError) {
-          const itemsPayload = items.map((it) => ({
-            order_id: newOrderId,
-            product_id: it.product.id,
-            product_name: it.product.name,
-            product_category: it.product.category,
-            product_weight: it.product.weight,
-            unit_price: it.product.price,
-            quantity: it.quantity,
-            line_total: it.product.price * it.quantity,
-          }));
-          await supabase.from("order_items").insert(itemsPayload);
-        } else {
-          console.warn("Order save skipped:", orderError.message);
-        }
-      } catch (bgErr) {
-        console.warn("Background order save failed:", bgErr);
-      }
 
       // Capture details before clearing storage
       const checkoutSummary = {
